@@ -10,7 +10,7 @@ import 'quake_network.dart';
 import 'package:mac_maps_and_permissions/settings.dart';
 
 
-//  ################################################################ Stateless top menu & MateriaApp
+//  ########################################################################### Stateless top menu
 class QuakeMapTop extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -22,11 +22,13 @@ class QuakeMapTop extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Earthquakes last 2 days",),
+        // The appBar include a back button, so there is no need for this icon,
+        // but it gives me an example of an action icon I can use for something
         actions: [
           IconButton(
             icon: Icon(Icons.access_alarms),
             onPressed: () {
-              Navigator.pop(context);               // doesn't work........
+              Navigator.pop(context);               // pop works from a Scaffold
 //               Navigator.push(context,
 //                   MaterialPageRoute(builder: (context) => SettingsTopMenu()));
             },  // onPressed
@@ -149,7 +151,7 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
               currentZoom++;              // decrease zoom
               _mapZoom(currentZoom);
             },
-            icon: Icon(Icons.search),
+            icon: Icon(Icons.plus_one_rounded),
           )
       ),
     );
@@ -158,7 +160,7 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
   Widget _zoomIn() {
     return Padding(
       // ######################################################## this padding seems to affect the map
-      padding: const EdgeInsets.only(bottom: 68.0),
+      padding: const EdgeInsets.only(bottom: 48.0),
       child: Align(
           alignment: Alignment.bottomLeft,
           child: IconButton(
@@ -168,7 +170,7 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
               currentZoom--;              // increase zoom
               _mapZoom(currentZoom);
             },
-            icon: Icon(Icons.control_point),
+            icon: Icon(Icons.exposure_minus_1_rounded),
           )
       ),
     );
@@ -187,7 +189,7 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
             markers: Set<Marker>.of(markerList),   //  Markers = quakes
             initialCameraPosition: CameraPosition(
               zoom: 2.5,                            // hard code the zoom level
-              target: quakeLocation,                // TODO: ought to be current location or view
+              target: vanuatuCentre,                // TODO: ought to be current location or view
             ),
             onMapCreated: (GoogleMapController controller) {
               _controller.complete(controller);
@@ -219,12 +221,13 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
 //    String _formatttedDateTime = "";
     setState(() {
       _quakeData.then((quakes) => {
-        quakes.features.forEach((quake) {            // forEach - loops through data
-          debugPrint('_handleResponse: **' +
-              " Magnitude: " + quake.properties.mag.toStringAsFixed(1) +
-              ' Quake properties time: ' +
-              getFormattedDate(DateTime.fromMillisecondsSinceEpoch(quake.properties.time)) +
-              "  " + quake.properties.place);
+        quakes.features.forEach((quake) {                                       // forEach - loops through data
+          // debugPrint('_handleResponse: **' +
+          //     " Magnitude: " + quake.properties.mag.toStringAsFixed(1) +
+          //     " sortString: " +(10.0-quake.properties.mag).toStringAsFixed(2) +
+          //     ' Quake properties time: ' +
+          //     getFormattedDate(DateTime.fromMillisecondsSinceEpoch(quake.properties.time)) +
+          //     "  " + quake.properties.place);
           markerList.add(Marker(
               markerId: MarkerId(quake.id),
               //                      note API give Long then Lat within co-ordinates
@@ -239,7 +242,7 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
           // MyQuakeDetail _qk = MyQuakeDetail(
           //   mag:
           // );
-         myQuakeDetailList.add(MyQuakeDetail(
+          myQuakeDetailList.add(MyQuakeDetail(
                 mag: quake.properties.mag,
                 place: quake.properties.place,
                 time: quake.properties.time,
@@ -247,17 +250,23 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
                 detail: quake.properties.detail,
                 url: quake.properties.url,
                 tz: quake.properties.tz,
-                )          );
-            }   // end of code
-          )    // end of ForEach loop
-        // so here we have loaded all quakes into the markerList
+                sortString: (10.0-quake.properties.mag).toStringAsFixed(2),
+                )          ); // end of .add
+            } // end of code (within forEach)
+        )    // end of ForEach loop
+      // so here we have loaded all quakes into the markerList
       });     // end of .then
    // try to SORT the my list
    // todo this sort doesn't seem to be working with a.mag
-      myQuakeDetailList.sort((a, b) => a.time.compareTo(b.time)); // LIST SORT (on the above combined sort field) 
-      debugPrint(">>> myQuakeDetailList.length = " + myQuakeDetailList.length.toString() );
-    });
-  }
+//      myQuakeDetailList.sort((a, b) => a.mag.compareTo(b.mag));   // LIST SORT - DOESN'T WORK ??
+//      myQuakeDetailList.sort((a, b) => a.time.compareTo(b.time)); // LIST SORT - works, but not what i want
+      debugPrint("> ** before sort ** >> myQuakeDetailList.length = " + myQuakeDetailList.length.toString() + " mag: "+ myQuakeDetailList[0].mag.toStringAsFixed(2));
+      myQuakeDetailList.sort((b, a) => a.mag.compareTo(b.mag));   // LIST SORT - DESCENDING
+//      myQuakeDetailList.sort((a, b) => a.time.compareTo(b.time)); // LIST SORT - works, but not what i want
+//      myQuakeDetailList.sort((b, ab) => a.sortString.compareTo(b.sortString)); // LIST SORT (on the above combined sort field) 
+      debugPrint("> ** after sort ** >> >> myQuakeDetailList.length = " + myQuakeDetailList.length.toString() + " mag: "+ myQuakeDetailList[0].mag.toStringAsFixed(2));
+    }); // end of setState
+  } // end of _handleResponse
 
 // tried moving this to the Get Quakes button
   //  WORKED TODAY  !  10Jun230 - no idea what changed

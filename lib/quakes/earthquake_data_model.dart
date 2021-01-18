@@ -294,8 +294,12 @@ class MyQuakeDetail{
   String tz;          // not sure what tz is
   String url;         // weblink
   String detail;      // string of details
+  String sortString;  // string used as 10 - mag Then sort ascending (i'e, strongest to lowest)
 
-MyQuakeDetail({this.mag, this.place, this.time, this.updated, this.tz, this.url, this.detail});
+MyQuakeDetail({this.mag, this.place, this.time, this.updated, this.tz, this.url, this.detail, this.sortString});
 }
 
+MyQuakeDetail workingQuakeDetail;
+int workingQuakeDetailIndex = 0;
+bool workingQuakeDetailChanged;
 List <MyQuakeDetail> myQuakeDetailList = [];

@@ -2,7 +2,9 @@ import 'dart:async';
 //import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:swipe_gesture_recognizer/swipe_gesture_recognizer.dart';
+import 'package:url_launcher/url_launcher.dart';
+//import 'package:flutter_icons/flutter_icons.dart';
 import 'earthquake_data_model.dart';
 //import 'list_quakes_ui.dart';
 import 'quake_map.dart';
@@ -66,20 +68,35 @@ class _QuakeListState extends State<QuakeList> {
         // todo: need a list builder to load a the correct list to card
       child: ListView.builder(
           itemCount: myQuakeDetailList.length,
-        itemBuilder: (BuildContext context, int index) {
-          return Card(
+        itemBuilder: (BuildContext context, int _index) {
+// // No data ????
+//           if(myQuakeDetailList.length ==0) {
+//             return Text("No quake data loaded...");
+//           }
+// Else we do have data
+            return Card(
             color: Colors.lightBlueAccent,
-            child: Row(
-                children: [
-                  CircleAvatar(radius: 18, child: Text('$index'),),
-                  Text(myQuakeDetailList[index].mag.toStringAsFixed(1)),
-                  Text(" | "),
-                  Text(getFormattedDate(DateTime.fromMillisecondsSinceEpoch(myQuakeDetailList[index].time))),
-                  Text(" | "),
-                  Text(myQuakeDetailList[index].place),
-//                  Text(featuresList.length.toString()),
-//                Text(featuresList[0].properties.mag.toStringAsFixed(1)),
-                ]
+            child: 
+            ListTile(
+            onTap: () {
+              workingQuakeDetailIndex = _index;
+              workingQuakeDetail = myQuakeDetailList[_index];
+              // workingQuakeDetailChanged = false; // do we need to save it....?
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => QuakeDetails()));
+            },
+            title: Row(
+                  children: [
+                    CircleAvatar(radius: 18, child: Text('$_index'),),
+                    Text(myQuakeDetailList[_index].mag.toStringAsFixed(1)),
+                    Text(" | "),
+                    Text(getFormattedDate(DateTime.fromMillisecondsSinceEpoch(myQuakeDetailList[_index].time))),
+                    Text(" | "),
+                    Text(myQuakeDetailList[_index].place),
+                  ]
+              ),
             ),
           );
         }   // end of item builder
@@ -118,5 +135,89 @@ class _QuakeListState extends State<QuakeList> {
       });
     }
 
+} // end of _QuakeListState
+
+class QuakeDetails extends StatefulWidget {
+  @override
+  _QuakeDetailsState createState() => _QuakeDetailsState();
+  
+}
+
+class _QuakeDetailsState extends State<QuakeDetails> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Quake details..")),
+      body: 
+      SwipeGestureRecognizer(
+        onSwipeLeft: ()  {swipeLeftOrClickNext();},
+        onSwipeRight: () {swipeRightOrClickPrevious();},
+    child:
+    Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+            children: <Widget>[
+              Text("Item: ${workingQuakeDetailIndex+1} of ${myQuakeDetailList.length}"),
+              Text(" "),                 // sloppy coding as a spacer
+              Row(children: <Widget>[
+                  Text("Time:        "),
+                Text(getFormattedDate(DateTime.fromMillisecondsSinceEpoch(workingQuakeDetail.time))),
+                ], ),
+              Row(children: <Widget>[
+                  Text("location: "),
+                  Text(workingQuakeDetail.place),
+                ], ),
+              Row(children: <Widget>[
+                  Text("Magnitude:   "),
+                  Text(workingQuakeDetail.mag.toStringAsFixed(2)),
+                ], ),
+              Text("Details:   "),
+              FlatButton(
+                  onPressed:() {
+                    //launch(workingQuakeDetail.detail);
+                    launchURL(workingQuakeDetail.detail);
+                  },
+                  child: Text(workingQuakeDetail.detail))
+              ,
+            ],
+          ),
+    ),
+      ),
+    );
+  }
+
+// pull out common code from navigator function to allow swipe to use it too
+  // swipe right is 'back' or 'previous', so decrease index
+void swipeRightOrClickPrevious() {
+  if (workingQuakeDetailIndex >= 1) {
+    setState(() {
+      debugPrint("swipe right - index: ${workingQuakeDetailIndex+1} of ${myQuakeDetailList.length}");
+      workingQuakeDetailIndex = workingQuakeDetailIndex - 1;
+      workingQuakeDetail = myQuakeDetailList[workingQuakeDetailIndex];
+    });
+  }
+}
+
+  // swipe left is 'forward' or 'next', so increase index
+void swipeLeftOrClickNext() {
+  if (workingQuakeDetailIndex + 1 < myQuakeDetailList.length) {
+    setState(() {
+      debugPrint("swipe left - index: ${workingQuakeDetailIndex+1} of ${myQuakeDetailList.length}");
+      workingQuakeDetailIndex = workingQuakeDetailIndex + 1;
+      workingQuakeDetail = myQuakeDetailList[workingQuakeDetailIndex];
+    });
+  }
+}
 
 }
+
+void launchURL(String url) async {
+  debugPrint("url: $url  launchUrl")  ;
+
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'Could not launch $url';
+  }
+}
+

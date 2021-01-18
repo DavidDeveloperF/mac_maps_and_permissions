@@ -28,7 +28,8 @@ final Color themeBackgroundColor2 = Colors.green;
 final String  mapAPI = "AIzaSyB74AyQiBalZjfcnCbFbjDmQL4skNWjf7I";
 // Richmond Park (roughly Pen Ponds)
 final LatLng centerMap = const LatLng(51.442, -0.2761);     // set map center point
-final LatLng homeLocation = const LatLng(51.4650, -0.2760);  // set map center point
+final LatLng vanuatuCentre = const LatLng(15.37, 166.95);   // set map center point 1.0.0+2
+final LatLng homeLocation = const LatLng(51.4650, -0.2760); // set map center point
 final LatLng quakeLocation = LatLng(51.442, -0.2761);  // set map center point
 
 final String quakeSourceURL = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson";
@@ -37,6 +38,6 @@ final String quakeSourceTitle = "USGS Magnitude 2.5+ Earthquakes, Past Day";
 
 double displayZoom = 13.5;                                  // very zoomed in
 //MapType displayMapType = MapType.hybrid;                    // various options
-//MapType displayMapType = MapType.satellite;                 // should be available in settings
+MapType displayMapType = MapType.satellite;                 // should be available in settings
 //MapType displayMapType = MapType.terrain;                   // this is good
-MapType displayMapType = MapType.normal;                    // alternatively
+//MapType displayMapType = MapType.normal;                    // alternatively

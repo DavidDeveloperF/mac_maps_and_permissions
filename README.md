@@ -1,5 +1,36 @@
 # mac_maps_and_permissions
 
+version: 1.0.0+2
+================
+* updated map centre to new variable centred on Vanuatu
+* added in a detail screen for quake list
+* added in swipegesture to move through on the details screen
+* tried to allow link to url in 'details'
+    ====================================================================================================
+    [VERBOSE-2:profiler_metrics_ios.mm(184)] Error retrieving thread information: (ipc/send) invalid destination port
+    flutter: url: https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/hv72323947.geojson  launchUrl
+    [VERBOSE-2:ui_dart_state.cc(177)] Unhandled Exception: MissingPluginException(No implementation found for method canLaunch on channel plugins.flutter.io/url_launcher)
+    #0      MethodChannel._invokeMethod (package:flutter/src/services/platform_channel.dart:157:7)
+    <asynchronous suspension>
+    #1      MethodChannel.invokeMethod (package:flutter/src/services/platform_channel.dart:332:12)
+    #2      MethodChannelUrlLauncher.canLaunch (package:url_launcher_platform_interface/method_channel_url_launcher.dart:22:21)
+    #3      canLaunch (package:url_launcher/url_launcher.dart:124:45)
+    #4      launchURL (package:mac_maps_and_permissions/quakes/list_quakes.dart:216:13)
+
+    Stackoverflow suggests use a direct call to launch() without the await
+        didn't work....
+        However, this did
+        "Try restarting the app. Not a hot restart or hot reload; a full restart"
+
+* try to fix the +/- zoom icons
+    Done - seems I had the wrong icons - theyere wer both in place & working (but wrong symbols)
+    Fixed with +1 and -1 as the icons
+
+* Fixed the 'sort' on myQuakeDetailsList
+    seems I had the sort in the wrong place in teh nested loops .forEach, etc
+    also discovered how to sort descending
+         myQuakeDetailList.sort((b, a) => a.mag.compareTo(b.mag));   // LIST SORT - DESCENDING
+
 
 Saved version 1.0
 =================
@@ -24,3 +55,5 @@ Managed to get maps working on iPhone !
 2) also need to add the following to info.plist *according to the training course)
         	<key>io.flutter.embedded_views_preview</key>
         	<true/>
+   I managed to miss off the final '>' on the <true/> which causes the app to fail to compile
+
