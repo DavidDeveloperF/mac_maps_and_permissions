@@ -21,7 +21,7 @@ class QuakeMapTop extends StatelessWidget {
     //  so seems I should only use the MaterialApp once at the top of the tree.....
     return Scaffold(
       appBar: AppBar(
-        title: Text("MENU Earthquakes prior 2 days ($appVersion)",),
+        title: Text("Earthquakes last 2 days",),
         actions: [
           IconButton(
             icon: Icon(Icons.access_alarms),
@@ -60,7 +60,7 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
   Completer<GoogleMapController> _controller = Completer();
   //    Markers are the 'flags' displayed on the map
   // this is a List of them
-  List<Marker> _markerList = <Marker>[];          // Empty list of map markers
+  List<Marker> markerList = <Marker>[];          // Empty list of map markers
   double currentZoom = 2.5;
 
   @override
@@ -117,13 +117,13 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
           items: [
             BottomNavigationBarItem( icon: Icon(Icons.control_point_duplicate),
                 // title: Text(bottomMapButtonText00)),
-                label: "MapButtonText00"),
+                label: bottomMapButtonText00),
             BottomNavigationBarItem( icon: Icon(Icons.landscape),
                 // title: Text(bottomMapButtonText00)),
-                label: "MapButtonText01"),
+                label: bottomMapButtonText01),
             BottomNavigationBarItem( icon: Icon(Icons.arrow_back),
                 // title: Text(bottomMapButtonText00)),
-                label: "MapButtonText02"),
+                label: bottomMapButtonText02),
           ],
           // notice the bottom navigator only calls one function (passing index for the option)
           onTap: (int index) {
@@ -139,7 +139,7 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
   Widget _zoomOut() {
     return Padding(
       // ######################################################## this padding seems to affect the map
-      padding: const EdgeInsets.only(bottom: 48.0),
+      padding: const EdgeInsets.only(bottom: 88.0),
       child: Align(
           alignment: Alignment.bottomLeft,
           child: IconButton(
@@ -158,7 +158,7 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
   Widget _zoomIn() {
     return Padding(
       // ######################################################## this padding seems to affect the map
-      padding: const EdgeInsets.only(bottom: 8.0),
+      padding: const EdgeInsets.only(bottom: 68.0),
       child: Align(
           alignment: Alignment.bottomLeft,
           child: IconButton(
@@ -184,9 +184,9 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
           child: GoogleMap(
             mapType: displayMapType,
             // ######################################### display quake data
-            markers: Set<Marker>.of(_markerList),   //  Markers = quakes
+            markers: Set<Marker>.of(markerList),   //  Markers = quakes
             initialCameraPosition: CameraPosition(
-              zoom: 3.0,                            // hard code the zoom level
+              zoom: 2.5,                            // hard code the zoom level
               target: quakeLocation,                // TODO: ought to be current location or view
             ),
             onMapCreated: (GoogleMapController controller) {
@@ -209,7 +209,7 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
   // get new Quake data (took off the floating button - it overlapped map controls)
   void findQuakes() {
     setState(() {
-      _markerList.clear();        // Make sure list if empty before we load anything
+      markerList.clear();        // Make sure list if empty before we load anything
       _handleResponse();          // load new data into list
     });
   }
@@ -219,9 +219,13 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
 //    String _formatttedDateTime = "";
     setState(() {
       _quakeData.then((quakes) => {
-        quakes.features.forEach((quake) => {            // forEach - loops through data
-//          debugPrint('Quake properties time: ');
-          _markerList.add(Marker(
+        quakes.features.forEach((quake) {            // forEach - loops through data
+          debugPrint('_handleResponse: **' +
+              " Magnitude: " + quake.properties.mag.toStringAsFixed(1) +
+              ' Quake properties time: ' +
+              getFormattedDate(DateTime.fromMillisecondsSinceEpoch(quake.properties.time)) +
+              "  " + quake.properties.place);
+          markerList.add(Marker(
               markerId: MarkerId(quake.id),
               //                      note API give Long then Lat within co-ordinates
               position: LatLng(quake.geometry.coordinates[1], quake.geometry.coordinates[0]),
@@ -230,18 +234,39 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
                       + " || "+ quake.properties.place),
 //            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue)
               icon: BitmapDescriptor.defaultMarkerWithHue(getQuakeIconHue(quake.properties.mag))
-          ))
-        })    // end of ForEach loop
+            ) // end marker
+          );  // end .add
+          // MyQuakeDetail _qk = MyQuakeDetail(
+          //   mag:
+          // );
+         myQuakeDetailList.add(MyQuakeDetail(
+                mag: quake.properties.mag,
+                place: quake.properties.place,
+                time: quake.properties.time,
+                updated: quake.properties.updated,
+                detail: quake.properties.detail,
+                url: quake.properties.url,
+                tz: quake.properties.tz,
+                )          );
+            }   // end of code
+          )    // end of ForEach loop
         // so here we have loaded all quakes into the markerList
       });     // end of .then
+   // try to SORT the my list
+   // todo this sort doesn't seem to be working with a.mag
+      myQuakeDetailList.sort((a, b) => a.time.compareTo(b.time)); // LIST SORT (on the above combined sort field) 
+      debugPrint(">>> myQuakeDetailList.length = " + myQuakeDetailList.length.toString() );
     });
   }
 
 // tried moving this to the Get Quakes button
   //  WORKED TODAY  !  10Jun230 - no idea what changed
   void displaySnackbar(BuildContext context) {
+
     final snackbar = SnackBar(content: Text(quakeSourceTitle),
-      duration: Duration(seconds: 5),);
+      duration: Duration(seconds: 4),);
+    debugPrint("SNACKBAR >>> myQuakeDetailList.length = " + myQuakeDetailList.length.toString() );
+
     Scaffold.of(context).showSnackBar(snackbar);
   }
 

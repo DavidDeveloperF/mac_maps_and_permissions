@@ -285,3 +285,17 @@ int checkInt(dynamic value) {
     return 0;
   }
 }
+
+class MyQuakeDetail{
+  double mag;         // magnitude
+  String place;       // location / place
+  int time;           // time
+  int updated;        // udpated
+  String tz;          // not sure what tz is
+  String url;         // weblink
+  String detail;      // string of details
+
+MyQuakeDetail({this.mag, this.place, this.time, this.updated, this.tz, this.url, this.detail});
+}
+
+List <MyQuakeDetail> myQuakeDetailList = [];

@@ -1,16 +1,26 @@
 # mac_maps_and_permissions
 
-A new Flutter application.
 
-## Getting Started
+Saved version 1.0
+=================
+Managed to get maps working on iPhone !
+1) have to get a API key and save it in AppDelegate.swift
+    import UIKit
+    import Flutter
+    import GoogleMaps
 
-This project is a starting point for a Flutter application.
+    @UIApplicationMain
+    @objc class AppDelegate: FlutterAppDelegate {
+      override func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+      ) -> Bool {
+        GMSServices.provideAPIKey("AIzaSyCNMPs2aQ10nFHTbb5RxAH0rgEaRIpioI4")
+        GeneratedPluginRegistrant.register(with: self)
+        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+      }
+    }
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+2) also need to add the following to info.plist *according to the training course)
+        	<key>io.flutter.embedded_views_preview</key>
+        	<true/>

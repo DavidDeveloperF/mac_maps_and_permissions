@@ -29,7 +29,7 @@ final String  mapAPI = "AIzaSyB74AyQiBalZjfcnCbFbjDmQL4skNWjf7I";
 // Richmond Park (roughly Pen Ponds)
 final LatLng centerMap = const LatLng(51.442, -0.2761);     // set map center point
 final LatLng homeLocation = const LatLng(51.4650, -0.2760);  // set map center point
-final LatLng quakeLocation = const LatLng(36.6762, 139.6560);  // set map center point
+final LatLng quakeLocation = LatLng(51.442, -0.2761);  // set map center point
 
 final String quakeSourceURL = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson";
 final String quakeSourceTitle = "USGS Magnitude 2.5+ Earthquakes, Past Day";
