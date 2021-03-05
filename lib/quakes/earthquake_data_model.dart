@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
+
 class EarthquakeData {
   String type;
   Metadata metadata;

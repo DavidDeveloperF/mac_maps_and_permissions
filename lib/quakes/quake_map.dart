@@ -2,9 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import "package:google_maps_flutter/google_maps_flutter.dart";
 import 'package:intl/intl.dart';
-import 'package:mac_maps_and_permissions/quakes/earthquake_data_model.dart';
 
+// my local packages/menus etc
 //import 'package:mac_maps_and_permissions/main.dart';
+import 'package:mac_maps_and_permissions/quakes/earthquake_data_model.dart';
+import 'package:mac_maps_and_permissions/quakes/quake_settings_menu.dart';
 import 'earthquake_data_model.dart';
 import 'list_quakes.dart';
 import 'quake_network.dart';
@@ -27,11 +29,11 @@ class QuakeMapTop extends StatelessWidget {
         // but it gives me an example of an action icon I can use for something
         actions: [
           IconButton(
-            icon: Icon(Icons.access_alarms),
+            icon: Icon(Icons.explore),
             onPressed: () {
-              Navigator.pop(context);               // pop works from a Scaffold
-//               Navigator.push(context,
-//                   MaterialPageRoute(builder: (context) => SettingsTopMenu()));
+//              Navigator.pop(context);               // pop works from a Scaffold
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => QuakeSettingsStatefulMenu()));
             },  // onPressed
           )
         ], //actions
@@ -64,16 +66,14 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
   //    Markers are the 'flags' displayed on the map
   // this is a List of them
   List<Marker> markerList = <Marker>[];          // Empty list of map markers
-  double currentZoom = 2.5;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _quakeData = QuakeNetwork().getAllQuakes();
     _quakeData.then((values) => {
-      debugPrint('*** This is the LOAD - in _QuakeMapState/initState \n '
-                 '  Place[0]: ${values.features[0].properties.title} \n'
+      debugPrint('*** <_QuakeMapMenuState #initState> This is the LOAD - in _QuakeMapState/initState \n '
+                 '  Place[0]: ${values.features[0].properties.title} '
                  '  ?????????')     // never seem to get here
       // debugPrint('Place: ${values.features[0].geometry.coordinates[0]}')
     });
@@ -193,7 +193,7 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
             markers: Set<Marker>.of(markerList),   //  Markers = quakes
             initialCameraPosition: CameraPosition(
               zoom: 2.5,                            // hard code the zoom level
-              target: vanuatuCentre,                // TODO: ought to be current location or view
+              target: vanuatuCentre,                // DONE: start in the Pacific, reset in list quakes
             ),
             onMapCreated: (GoogleMapController controller) {
               _controller.complete(controller);
@@ -221,17 +221,19 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
       //  position: vanuatuCentre,
       //  infoWindow: InfoWindow(title: "Map centre"), )
       //  );
-      // TODO:  don't understand why clearing the detail list stop teh markers displaying on the map
+      // TODO:  don't understand why clearing the detail list stops Markers displaying on the map
 
       myQuakeDetailList.clear();    // Make sure list if empty before we load anything V1.0.0+3
+      debugPrint("@~@~@~@~ <findQuakes> myQuakeDetailList.isEmpty?  ${myQuakeDetailList.isEmpty} ");
       _handleResponse();            // load new data into list
     });
   }
 
   // ########################################################## update quake markers
   void _handleResponse() {
-    double _lat;
-    double _lng;
+    MyQuakeDetail _quakeDetail;
+    // double _lat;
+    // double _lng;
     String _tz;
     //    String _formatttedDateTime = "";
     setState(() {
@@ -244,41 +246,35 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
         debugPrint("_quakeData.then .... (features.length)=" + quakes.features.length.toString());
 
         quakes.features.forEach((quake) {                                       // forEach - loops through data
-          debugPrint('_handleResponse: **' +
-              " Magnitude: " + quake.properties.mag.toStringAsFixed(1) +
-              " sortString: " +(10.0-quake.properties.mag).toStringAsFixed(2) +
-              ' Quake properties time: ' +
-              getFormattedDate(DateTime.fromMillisecondsSinceEpoch(quake.properties.time)) +
-              "  " + quake.properties.place);
+          // debugPrint('_handleResponse: **' +
+          //     " Magnitude: " + quake.properties.mag.toStringAsFixed(1) +
+          //     " sortString: X-X-X (see below) " +
+          //     ' Quake properties time: ' +
+          //     getFormattedDate(DateTime.fromMillisecondsSinceEpoch(quake.properties.time)) +
+          //     "  " + quake.properties.place);
           markerList.add(Marker(
               markerId: MarkerId(quake.id),
               //                      note API give Long then Lat within co-ordinates
               position: LatLng(quake.geometry.coordinates[1], quake.geometry.coordinates[0]),
               infoWindow: InfoWindow(title: quake.properties.mag.toString(),
                   snippet:  getFormattedDate(DateTime.fromMillisecondsSinceEpoch(quake.properties.time))
-                      + " || "+ quake.properties.place),
+                      + " || "+ quake.properties.place + " " +
+                      quake.geometry.coordinates[1].toStringAsFixed(4) +" / "+
+                      quake.geometry.coordinates[0].toStringAsFixed(4)),
 //            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue)
               icon: BitmapDescriptor.defaultMarkerWithHue(getQuakeIconHue(quake.properties.mag))
             ) // end marker
           );  // end .add
-          // MyQuakeDetail _qk = MyQuakeDetail(
-          //   mag:
-          // );
 
-          // thought the range error might have been on the 'geometry'
-          // try {
-          //   _lat = quake.geometry.coordinates[1];
-          //   _lng = quake.geometry.coordinates[0];
-          // } catch (error) {
-          //   _lat = 0.0;
-          //   _lng = 0.0;
-          // }
+
           if (quake.properties.tz == null) {
             _tz = "null";
           } else {
             _tz = quake.properties.tz;
           }
-          myQuakeDetailList.add(MyQuakeDetail(
+
+          // set up a local MyQuakeDetail
+          _quakeDetail = MyQuakeDetail(
                 mag: quake.properties.mag,
                 place: quake.properties.place,
                 lat: quake.geometry.coordinates[1],
@@ -288,34 +284,93 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
                 detail: quake.properties.detail,
                 url: quake.properties.url,
                 tz: _tz,
-                sortString: (10.0-quake.properties.mag).toStringAsFixed(2),
-                )          ); // end of .add
-            } // end of code (within forEach)
+                sortString: "XX"); // end of .add
+          // update sort                                uses quakeSortSequence setting
+          _quakeDetail.sortString = _getSortString(_quakeDetail);
+
+          // add to
+          myQuakeDetailList.add(_quakeDetail);
+
+          debugPrint('_handleResponse: **' +
+              " Magnitude: " + quake.properties.mag.toStringAsFixed(1) +
+              " sortString:" + _quakeDetail.sortString +
+              ' Quake properties time: ' +
+              getFormattedDate(DateTime.fromMillisecondsSinceEpoch(quake.properties.time)) +
+              "  " + quake.properties.place);
+
+        } // end of code (within forEach)
+
         ) ;   // end of ForEach loop
       // so here we have loaded all quakes into the markerList
+      // if not empty list, SORT the my list
+        if (myQuakeDetailList.isEmpty){
+          debugPrint("@#>@#>@#> ** NO SORT - EMPTY LIST** >> myQuakeDetailList.length = " );
+        } else {
+          sortQuakeDetailList();
+        }
       });     // end of .then
-   // try to SORT the my list
-   // todo this sort doesn't seem to be working with a.mag
-//      myQuakeDetailList.sort((a, b) => a.mag.compareTo(b.mag));   // LIST SORT - DOESN'T WORK ??
-//      myQuakeDetailList.sort((a, b) => a.time.compareTo(b.time)); // LIST SORT - works, but not what i want
-      if (myQuakeDetailList.isEmpty){
-        debugPrint("> ** EMPTY ** >> myQuakeDetailList.length = " );
-      } else {
-        debugPrint("> ** BEFORE sort ** >> myQuakeDetailList.length = " +
-            myQuakeDetailList.length.toString());
-        debugPrint("> ** before sort ** >> myQuakeDetailList.length = " +
-            myQuakeDetailList.length.toString() + " mag: " +
-            myQuakeDetailList[0].mag.toStringAsFixed(2));
-        myQuakeDetailList.sort((b, a) =>
-            a.mag.compareTo(b.mag)); // LIST SORT - DESCENDING
-//      myQuakeDetailList.sort((a, b) => a.time.compareTo(b.time)); // LIST SORT - works, but not what i want
-//      myQuakeDetailList.sort((b, ab) => a.sortString.compareTo(b.sortString)); // LIST SORT (on the above combined sort field) 
-        debugPrint("> ** after sort ** >> >> myQuakeDetailList.length = " +
-            myQuakeDetailList.length.toString() + " mag: " +
-            myQuakeDetailList[0].mag.toStringAsFixed(2));
-      }
+
     }); // end of setState
+
   } // end of _handleResponse
+
+  // ############################################################################# sortQuakeDetailList
+  void   sortQuakeDetailList() {
+    if (quakeSortSequence == "D" ) {                          // sort descending for dates
+      myQuakeDetailList.sort((b, a) => a.sortString.compareTo(b.sortString));
+    } else {                                                  // sort ascending
+                                                              // sort on mag is actually 10-mag
+      myQuakeDetailList.sort((a, b) => a.sortString.compareTo(b.sortString));
+    }
+
+  debugPrint("@#>@#> ** after sort ** FIRST ITEM: = " +
+      " Time: " + getFormattedDate(DateTime.fromMillisecondsSinceEpoch(myQuakeDetailList[0].time)) +
+      " Mag: " +  myQuakeDetailList[0].mag.toStringAsFixed(2) +
+      " Place: " + myQuakeDetailList[0].place +
+      ".");
+
+  } // end of sortQuakeDetailList
+
+// ############################################################################# _getSortString
+  String _getSortString(MyQuakeDetail _quakeDetail) {
+    double _dbl1;
+    double _dbl2;
+    String _sortString;
+    //String quakeSortSequence = "A";      // A - alphabetical (place)
+    //                                     // B - magnitude (largest to smallest)
+    //                                     // D - date (newest to oldest)
+    //                                     // L - location (lat+lng)
+    if (sortPrintDebug) {
+      debugPrint("@@@@@ SORT Sequence = $quakeSortSequence");
+      sortPrintDebug = false;
+    }
+    switch (quakeSortSequence) {
+      case "A":                            // A - alphabetical (place)
+        _sortString = _quakeDetail.place;
+        break;
+      case "B":                            // B mag - largest to smallest
+        _sortString = (10.0-_quakeDetail.mag).toStringAsFixed(2) ;
+        break;
+      case "D":                            // D - date
+        _sortString = _quakeDetail.time.toString();
+        break;
+      case "L":                            // L - location  closeness to 0' 0'
+        if (_quakeDetail.lat < 0) {
+          _dbl1 = _quakeDetail.lat * -1.0;       } else {
+          _dbl1 = _quakeDetail.lat * 1.0;        }
+        if (_quakeDetail.lng < 0) {
+          _dbl2 = _quakeDetail.lng * -1.0;       } else {
+          _dbl2 = _quakeDetail.lng * 1.0;        }
+        _sortString = (_dbl1 + _dbl2).toStringAsFixed(4) ;
+        break;
+      default:
+        _sortString = "XXX unknown sort";
+        break;
+    }
+
+    return _sortString;
+  }   // end of _getSortString
+
 
 // tried moving this to the Get Quakes button
   //  WORKED TODAY  !  10Jun230 - no idea what changed
@@ -364,6 +419,7 @@ class _QuakeMapMenuState extends State<QuakeMapMenu> {
 
 
 
+
 // ###################################### Quake icon colors ############################
 // Want to have bright red colour for big quakes, down to green for tiny ones
 double getQuakeIconHue(double mag) {
@@ -392,3 +448,4 @@ Color getQuakeMagColor(double mag) {
 String getFormattedDate(DateTime dateTime) {
   return new DateFormat("EEE HH:mm").format(dateTime);
 }
+

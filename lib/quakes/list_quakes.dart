@@ -2,11 +2,11 @@ import 'dart:async';
 //import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:swipe_gesture_recognizer/swipe_gesture_recognizer.dart';
 import 'package:url_launcher/url_launcher.dart';
-//import 'package:flutter_icons/flutter_icons.dart';
+import '../settings.dart';
 import 'earthquake_data_model.dart';
-//import 'list_quakes_ui.dart';
 import 'quake_map.dart';
 import 'quake_network.dart';
 //import 'package:mac_maps_and_permissions/settings.dart';
@@ -65,7 +65,7 @@ class _QuakeListState extends State<QuakeList> {
       ),
       body: Container(
       //  child: Text("test text"),
-        // todo: need a list builder to load a the correct list to card
+        // DONE: need a list builder to load a the correct list to card
       child: ListView.builder(
           itemCount: myQuakeDetailList.length,
         itemBuilder: (BuildContext context, int _index) {
@@ -183,8 +183,15 @@ class _QuakeDetailsState extends State<QuakeDetails> {
                   Text(workingQuakeDetail.mag.toStringAsFixed(2)),
                 ], ),
 //            Text(workingQuakeDetail.tz + " Details: " ),    .tz appears to be null
-              Text("Details: " ),
-              FlatButton(
+              RaisedButton(color: Colors.lightGreen,
+                child: Text("Set map zoomTo location"),
+                  onPressed: () {
+                    quakeLocation = LatLng(workingQuakeDetail.lat, workingQuakeDetail.lng );
+                    currentZoom = 13.5;
+                    Navigator.pop(context);             // WORKING !
+                  }),
+              Text("View Details: " ),
+              FlatButton(color: Colors.blueAccent,
                   onPressed:() {
                     launchURL(workingQuakeDetail.detail);
                   },
