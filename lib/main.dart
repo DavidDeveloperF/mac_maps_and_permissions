@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mac_maps_and_permissions/quakes/quake_map.dart';
+import 'package:mac_maps_and_permissions/settings.dart';
 
 void main() {
   runApp(MyApp());
@@ -90,6 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Text('Refreshed: ' + DateFormat("EEE HH:mm").format(DateTime.now())),
             Text(
               'You have pushed the + button this many times:',
             ),
@@ -104,7 +107,52 @@ class _MyHomePageState extends State<MyHomePage> {
                     MaterialPageRoute(builder: (context) => QuakeMapTop()));
                 //    Navigator.of(context).pop(); 
                 }
-            )
+            ),
+
+//      Ok, here's a dirty way to color the buttons green when this option set
+//          each button appears twice
+//      TODO: a clean method would set the actual color as a function
+//            eg  color: greenIfMapTypIsThisOption("normal")
+            if (displayMapType == displayNormal) RaisedButton(
+                  child: Text("Map type - normal"),
+                  color: Colors.lightGreen,
+                  onPressed: () {setState(() {changeMapType("normal");}); }
+                  ),
+            if (displayMapType != displayNormal) RaisedButton(
+                  child: Text("Map type - normal"),
+                  color: Colors.grey,
+                onPressed: () {setState(() {changeMapType("normal");}); }
+            ),
+            if (displayMapType == displaySatellite) RaisedButton(
+                  child: Text("Map type - satellite"),
+                  color: Colors.lightGreen,
+                  onPressed: () {setState(() {changeMapType("satellite");}); }
+                  ),
+            if (displayMapType != displaySatellite) RaisedButton(
+                  child: Text("Map type - satellite"),
+                  color: Colors.grey,
+                onPressed: () {setState(() {changeMapType("satellite");}); }
+            ),
+            if (displayMapType == displayHybrid) RaisedButton(
+                  child: Text("Map type - hybrid"),
+                  color: Colors.lightGreen,
+                  onPressed: () {setState(() {changeMapType("hybrid");}); }
+                  ),
+            if (displayMapType != displayHybrid) RaisedButton(
+                  child: Text("Map type - hybrid"),
+                  color: Colors.grey,
+                onPressed: () {setState(() {changeMapType("hybrid");}); }
+            ),
+            if (displayMapType == displayTerrain) RaisedButton(
+                  child: Text("Map type - terrain"),
+                  color: Colors.lightGreen,
+                  onPressed: () {setState(() {changeMapType("terrain");}); }
+                  ),
+            if (displayMapType != displayTerrain) RaisedButton(
+                  child: Text("Map type - terrain"),
+                  color: Colors.grey,
+                onPressed: () {setState(() {changeMapType("terrain");}); }
+            ),
           ],
         ),
       ),

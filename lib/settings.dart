@@ -37,7 +37,28 @@ final String quakeSourceTitle = "USGS Magnitude 2.5+ Earthquakes, Past Day";
 
 
 double displayZoom = 13.5;                                  // very zoomed in
-//MapType displayMapType = MapType.hybrid;                    // various options
 MapType displayMapType = MapType.satellite;                 // should be available in settings
-//MapType displayMapType = MapType.terrain;                   // this is good
-//MapType displayMapType = MapType.normal;                    // alternatively
+MapType displaySatellite = MapType.satellite;                 // should be available in settings
+MapType displayHybrid  = MapType.hybrid;                    // various options
+MapType displayTerrain = MapType.terrain;                   // this is good
+MapType displayNormal  = MapType.normal;                    // alternatively
+void changeMapType(String mapTypeString) {
+  switch (mapTypeString) {
+    case "normal":
+      displayMapType = displayNormal;
+      break;
+    case "hybrid":
+      displayMapType = displayHybrid;
+      break;
+    case "satellite":
+      displayMapType = displaySatellite;
+      break;
+    case "terrain":
+      displayMapType = displayTerrain;
+      break;
+    default:
+      displayMapType = displayNormal;
+      break;
+  } // end of switch
+
+} // end of chamgemaptype

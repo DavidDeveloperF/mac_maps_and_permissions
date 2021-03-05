@@ -289,6 +289,8 @@ int checkInt(dynamic value) {
 class MyQuakeDetail{
   double mag;         // magnitude
   String place;       // location / place
+  double lat;
+  double lng;
   int time;           // time
   int updated;        // udpated
   String tz;          // not sure what tz is
@@ -296,7 +298,8 @@ class MyQuakeDetail{
   String detail;      // string of details
   String sortString;  // string used as 10 - mag Then sort ascending (i'e, strongest to lowest)
 
-MyQuakeDetail({this.mag, this.place, this.time, this.updated, this.tz, this.url, this.detail, this.sortString});
+MyQuakeDetail({this.mag, this.place, this.lat, this.lng,this.time,
+  this.updated, this.tz, this.url, this.detail, this.sortString});
 }
 
 MyQuakeDetail workingQuakeDetail;

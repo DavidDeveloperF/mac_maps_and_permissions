@@ -87,14 +87,19 @@ class _QuakeListState extends State<QuakeList> {
                   MaterialPageRoute(
                       builder: (context) => QuakeDetails()));
             },
-            title: Row(
+            title:
+
+            Row(
                   children: [
-                    CircleAvatar(radius: 18, child: Text('$_index'),),
-                    Text(myQuakeDetailList[_index].mag.toStringAsFixed(1)),
-                    Text(" | "),
-                    Text(getFormattedDate(DateTime.fromMillisecondsSinceEpoch(myQuakeDetailList[_index].time))),
-                    Text(" | "),
-                    Text(myQuakeDetailList[_index].place),
+                    CircleAvatar(radius: 18, backgroundColor: getQuakeMagColor(myQuakeDetailList[_index].mag),
+                child: Text(myQuakeDetailList[_index].mag.toStringAsFixed(1)),),
+//          Problems with overflow - this 'dirty' fix is to substring the text I want and limit the length
+//          todo: ought to limit the size with a width based on the screen width, but can't be bothered today
+                    Text((getFormattedDate(DateTime.fromMillisecondsSinceEpoch(myQuakeDetailList[_index].time)) +
+                          " | " +
+                          myQuakeDetailList[_index].place +
+                          "                                                    ").substring(0,42)
+                        ),
                   ]
               ),
             ),
@@ -164,17 +169,23 @@ class _QuakeDetailsState extends State<QuakeDetails> {
                 Text(getFormattedDate(DateTime.fromMillisecondsSinceEpoch(workingQuakeDetail.time))),
                 ], ),
               Row(children: <Widget>[
-                  Text("location: "),
+                  Text("place:       "),
                   Text(workingQuakeDetail.place),
+                ], ),
+              Row(children: <Widget>[
+                  Text("location:    "),
+                  Text(workingQuakeDetail.lat.toStringAsFixed(4)),
+                  Text(" / "),
+                  Text(workingQuakeDetail.lng.toStringAsFixed(4)),
                 ], ),
               Row(children: <Widget>[
                   Text("Magnitude:   "),
                   Text(workingQuakeDetail.mag.toStringAsFixed(2)),
                 ], ),
-              Text("Details:   "),
+//            Text(workingQuakeDetail.tz + " Details: " ),    .tz appears to be null
+              Text("Details: " ),
               FlatButton(
                   onPressed:() {
-                    //launch(workingQuakeDetail.detail);
                     launchURL(workingQuakeDetail.detail);
                   },
                   child: Text(workingQuakeDetail.detail))

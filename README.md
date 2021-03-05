@@ -1,5 +1,29 @@
 # mac_maps_and_permissions
 
+version: 1.0.0+3
+================
+* Warning from Github that I 'published' an API key
+    Managed to get maps working on iPhone !
+        DONE: need  **/AppDelegate.swift in the .gitignore file (don't want to put API key into Github)
+* tried to improve the sort and added buttons to choose map type, but seem to have broken the map
+    I need to review the changes & try to figure out what I've done wrong.
+    This error is probably the cause:
+
+    ======== Exception caught by gesture ===============================================================
+    The following RangeError was thrown while handling a gesture:
+    RangeError (index): Invalid value: Valid value range is empty: 0
+    When the exception was thrown, this was the stack:
+    #0      List.[] (dart:core-patch/growable_array.dart:177:60)
+    #1      _QuakeMapMenuState._handleResponse.<anonymous closure> (package:mac_maps_and_permissions/quakes/quake_map.dart:269:138)
+    #2      State.setState (package:flutter/src/widgets/framework.dart:1244:30)
+    #3      _QuakeMapMenuState._handleResponse (package:mac_maps_and_permissions/quakes/quake_map.dart:225:5)
+    #4      _QuakeMapMenuState.findQuakes.<anonymous closure> (package:mac_maps_and_permissions/quakes/quake_map.dart:218:7)
+
+    Not clear what is causing this, but I suspect the API has not loaded the data to trying to loop
+    through an empty data set. Might need to use an async or future. When I press a second time, it
+    does seem to work (now after undoing a few recent edits.)  Not sure, but might have always had
+    this problem...
+
 version: 1.0.0+2
 ================
 * updated map centre to new variable centred on Vanuatu
@@ -23,7 +47,7 @@ version: 1.0.0+2
         "Try restarting the app. Not a hot restart or hot reload; a full restart"
 
 * try to fix the +/- zoom icons
-    Done - seems I had the wrong icons - theyere wer both in place & working (but wrong symbols)
+    Done - seems I had the wrong icons - they were both in place & working (but wrong symbols)
     Fixed with +1 and -1 as the icons
 
 * Fixed the 'sort' on myQuakeDetailsList
@@ -31,10 +55,15 @@ version: 1.0.0+2
     also discovered how to sort descending
          myQuakeDetailList.sort((b, a) => a.mag.compareTo(b.mag));   // LIST SORT - DESCENDING
 
+DONE: didn't work on Android....  (needed maps API key somewhere else ???)
+    it DOES need the key - in android manifest
+    android/app/src/main/AndroidManifest.xml
 
 Saved version 1.0
 =================
 Managed to get maps working on iPhone !
+    TODO: need  **/AppDelegate.swift in the .gitignore file (don't want to put API key into Github)
+
 1) have to get a API key and save it in AppDelegate.swift
     import UIKit
     import Flutter
