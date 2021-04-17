@@ -1,10 +1,10 @@
 # mac_maps_and_permissions
 
+ver: 1.0.1+0
 ver: 1.0.0+4
 ------------
 *   tidied up code
 *   new settings menu
-
 
 version: 1.0.0+3
 ================

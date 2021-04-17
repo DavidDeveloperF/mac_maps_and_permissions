@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:mac_maps_and_permissions/quakes/quake_map.dart';
 import 'package:mac_maps_and_permissions/quakes/quake_settings_menu.dart';
 import 'package:mac_maps_and_permissions/settings.dart';
+import 'package:mac_maps_and_permissions/utils/dbadmin_class.dart';
 
 void main() {
   runApp(MyApp());
@@ -115,6 +116,15 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => QuakeSettingsStatefulMenu()));
+                //    Navigator.of(context).pop(); 
+                }
+            ),
+            RaisedButton(color: Colors.orangeAccent,
+              child: Text("Test DbAdmin"),
+              onPressed: () {
+                testDbAdmin();
+                // Navigator.push(context,
+                //     MaterialPageRoute(builder: (context) => QuakeSettingsStatefulMenu()));
                 //    Navigator.of(context).pop(); 
                 }
             ),
