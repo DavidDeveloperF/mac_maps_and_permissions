@@ -75,10 +75,15 @@ class DbAdmin {
     spareString             = ".";
   }
 
+  // ##########################################################################
+  // # createAsString(String createText, String whereFrom, String sourceKey, ) {
+  // #
+  // # runs the create mthod, then uses toString to send back a string
+  // ###########################################################################
   String createAsString(String createText, String whereFrom, String sourceKey, ) {
     create(createText, whereFrom, sourceKey);
     return toString();
-  }
+  } // end of createAsString
   void create(String createText, String whereFrom, String sourceKey, ) {
     key                 = sourceKey ?? defaultDbAdmin.key;            // override null
     lastAction          = "Create";
@@ -211,7 +216,7 @@ class DbAdmin {
   //   _result = _result + "}";
 
     /// alternative version with ' and " swapped & trailing comma removed manually
-    String _result = '{';
+    String _result = "{";
     _result = _result + ' "key":  "' +                     (key ?? defaultDbAdmin.key) + '" ,';
     _result = _result + ' "version":  ' +                  (version ?? defaultDbAdmin.version).toString() + ', ';
     _result = _result + ' "lastAction":  "' +              (lastAction ?? defaultDbAdmin.lastAction) + '" ,';
@@ -237,8 +242,68 @@ class DbAdmin {
     _result = _result + ' "updateAppName":  "' +           (updateAppName ?? defaultDbAdmin.updateAppName) + '" ,';
     _result = _result + ' "updateAppVersion":  "' +        (updateAppVersion ?? defaultDbAdmin.updateAppVersion) + '" ,';
     _result = _result + ' "spareString":  "' +             (spareString ?? defaultDbAdmin.spareString) + '" ';
+// TODO - remove trailing comma [not technically valid in JSON, so will cause decode errors]
+    _result = _result + "}";
 
-    _result = _result + '}';
+   /// This is what the JSON string output should look like
+    //   { "key":  "sourceKey 290" , "version":  0,  "lastAction":  "Create" , "createComment":  "Debug test createText" , "calledFrom":  "whereFrom= testDbAdmin row 290" , "createDateTimeText":  "Sat 20:26" , "createDateTimeInt":  1618687608775,  "createLat":  -3.0674,  "createLng":  37.35519,  "createDeviceId":  "dummy deviceId" , "createDeviceDescription":  "device ???" , "createUserId":  "dummy userId" , "createAppName":  "Network Connection Tracker" , "createAppVersion":  "??" , "updateComment":  "." , "updateDateTimeText":  "Thu 21-June 18:30" , "updateDateTimeInt":  123456789,  "updateLat":  3.14,  "updateLng":  159.01,  "updateDeviceId":  "dummy deviceId" , "updateDeviceDescription":  "device ???" , "updateUserId":  "dummy userId" , "updateAppName":  "Network Connection Tracker" , "updateAppVersion":  "??" , "spareString":  "." }
+   /// And here's how it translates back into a Map (using anotherJSONTest below)
+    // I/flutter ( 3216): Key= key Value= sourceKey 290
+    // I/flutter ( 3216): Key= version Value= 0
+    // I/flutter ( 3216): Key= lastAction Value= Create
+    // I/flutter ( 3216): Key= createComment Value= Debug test createText
+    // I/flutter ( 3216): Key= calledFrom Value= whereFrom= testDbAdmin row 290
+    // I/flutter ( 3216): Key= createDateTimeText Value= Sat 20:26
+    // I/flutter ( 3216): Key= createDateTimeInt Value= 1618687608775
+    // I/flutter ( 3216): Key= createLat Value= -3.0674
+    // I/flutter ( 3216): Key= createLng Value= 37.35519
+    // I/flutter ( 3216): Key= createDeviceId Value= dummy deviceId
+    // I/flutter ( 3216): Key= createDeviceDescription Value= device ???
+    // I/flutter ( 3216): Key= createUserId Value= dummy userId
+    // I/flutter ( 3216): Key= createAppName Value= Network Connection Tracker
+    // I/flutter ( 3216): Key= createAppVersion Value= ??
+    // I/flutter ( 3216): Key= updateComment Value= .
+    // I/flutter ( 3216): Key= updateDateTimeText Value= Thu 21-June 18:30
+    // I/flutter ( 3216): Key= updateDateTimeInt Value= 123456789
+    // I/flutter ( 3216): Key= updateLat Value= 3.14
+    // I/flutter ( 3216): Key= updateLng Value= 159.01
+    // I/flutter ( 3216): Key= updateDeviceId Value= dummy deviceId
+    // I/flutter ( 3216): Key= updateDeviceDescription Value= device ???
+    // I/flutter ( 3216): Key= updateUserId Value= dummy userId
+    // I/flutter ( 3216): Key= updateAppName Value= Network Connection Tracker
+    // I/flutter ( 3216): Key= updateAppVersion Value= ??
+    // I/flutter ( 3216): Key= spareString Value= .
+
+    /// version below... I manually swapped " and ' characters & manually deleted the trailing comma after spareString
+    // String _result = '{';
+    //
+    // _result = _result + ' "key":  "' +                     (key ?? defaultDbAdmin.key) + '" ,';
+    // _result = _result + ' "version":  ' +                  (version ?? defaultDbAdmin.version).toString() + ', ';
+    // _result = _result + ' "lastAction":  "' +              (lastAction ?? defaultDbAdmin.lastAction) + '" ,';
+    // _result = _result + ' "createComment":  "' +           (createComment ?? defaultDbAdmin.createComment) + '" ,';
+    // _result = _result + ' "calledFrom":  "' +              (calledFrom ?? defaultDbAdmin.calledFrom) + '" ,';
+    // _result = _result + ' "createDateTimeText":  "' +      (createDateTimeText ?? defaultDbAdmin.createDateTimeText) + '" ,';
+    // _result = _result + ' "createDateTimeInt":  ' +        (createDateTimeInt ?? defaultDbAdmin.createDateTimeInt).toString() + ', ';
+    // _result = _result + ' "createLat":  ' +                (createLat ?? defaultDbAdmin.createLat).toString() + ', ';
+    // _result = _result + ' "createLng":  ' +                (createLng ?? defaultDbAdmin.createLng).toString() + ', ';
+    // _result = _result + ' "createDeviceId":  "' +          (createDeviceId ?? defaultDbAdmin.createDeviceId) + '" ,';
+    // _result = _result + ' "createDeviceDescription":  "' + (createDeviceDescription ?? defaultDbAdmin.createDeviceDescription) + '" ,';
+    // _result = _result + ' "createUserId":  "' +            (createUserId ?? defaultDbAdmin.createUserId) + '" ,';
+    // _result = _result + ' "createAppName":  "' +           (createAppName ?? defaultDbAdmin.createAppName) + '" ,';
+    // _result = _result + ' "createAppVersion":  "' +        (createAppVersion ?? defaultDbAdmin.createAppVersion) + '" ,';
+    // _result = _result + ' "updateComment":  "' +           (updateComment ?? defaultDbAdmin.updateComment) + '" ,';
+    // _result = _result + ' "updateDateTimeText":  "' +      (updateDateTimeText ?? defaultDbAdmin.updateDateTimeText) + '" ,';
+    // _result = _result + ' "updateDateTimeInt":  ' +        (updateDateTimeInt ?? defaultDbAdmin.updateDateTimeInt).toString() + ', ';
+    // _result = _result + ' "updateLat":  ' +                (updateLat ?? defaultDbAdmin.updateLat).toString() + ', ';
+    // _result = _result + ' "updateLng":  ' +                (updateLng ?? defaultDbAdmin.updateLng).toString() + ', ';
+    // _result = _result + ' "updateDeviceId":  "' +          (updateDeviceId ?? defaultDbAdmin.updateDeviceId) + '" ,';
+    // _result = _result + ' "updateDeviceDescription":  "' + (updateDeviceDescription ?? defaultDbAdmin.updateDeviceDescription) + '" ,';
+    // _result = _result + ' "updateUserId":  "' +            (updateUserId ?? defaultDbAdmin.updateUserId) + '" ,';
+    // _result = _result + ' "updateAppName":  "' +           (updateAppName ?? defaultDbAdmin.updateAppName) + '" ,';
+    // _result = _result + ' "updateAppVersion":  "' +        (updateAppVersion ?? defaultDbAdmin.updateAppVersion) + '" ,';
+    // _result = _result + ' "spareString":  "' +             (spareString ?? defaultDbAdmin.spareString) + '" ';
+    //
+    // _result = _result + '}';
 
     return _result;
   }
@@ -293,6 +358,8 @@ DbAdmin  workingDbAdmin;                       // a working or current DbAdmin s
 int      workingDbAdminIndex;                  // integer index of current place in the array
 bool     workingDbAdminChanged;                // bool to flag whether working___ has been changed
 
+
+// ############################################################################# default values
 DbAdmin defaultDbAdmin = DbAdmin  (
   key:                   "123456789000",
   version:               0,
