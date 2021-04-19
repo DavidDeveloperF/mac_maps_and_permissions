@@ -23,7 +23,12 @@ import 'package:mac_maps_and_permissions/utils/utilities.dart';
 //  updateAsString	TODO  return dbAdmin record as a JSON string
 //                        [to save in a Firebase rtdb string field]
 //  toString              returns JSON format (used by the above)
-// #############################################################################
+//
+//  dbAdminFromString     reads the toString output and decodes back to DbAdmin
+///  ^^ this is a separate function that returns a DbAdmin object
+///     Don't want this to overwrite values setup in the code's 'main' dbAdmin
+//  Map<String, dynamic> stringToMapConverter(String inputString) {
+///     string to Map converter could be common code (utilities.dart ?)
 // #############################################################################
 class DbAdmin {
   String     key;                             // Parent key (or createDateTimeInt as String)
@@ -274,7 +279,8 @@ class DbAdmin {
     // I/flutter ( 3216): Key= updateAppVersion Value= ??
     // I/flutter ( 3216): Key= spareString Value= .
 
-    /// version below... I manually swapped " and ' characters & manually deleted the trailing comma after spareString
+    /// version below... I manually swapped " and ' characters & manually
+    /// deleted the trailing comma after spareString
     // String _result = '{';
     //
     // _result = _result + ' "key":  "' +                     (key ?? defaultDbAdmin.key) + '" ,';
@@ -306,7 +312,7 @@ class DbAdmin {
     // _result = _result + '}';
 
     return _result;
-  }
+  } // end of toString ############
 
   // Not sure I want to be able to access all these attributes
   // class should set everything except the original key and comments
@@ -338,20 +344,77 @@ class DbAdmin {
     this.spareString,
   });
 
-  void fromJSON(Map<String, dynamic>json) {
-    key           = json['key'];
-    version       = int.parse(json['version'] ?? defaultDbAdmin.version);
-    createLat     = double.parse(json['createLat'] ?? defaultDbAdmin.createLat);
-    createLng     = double.parse(json['createLng'] ?? defaultDbAdmin.createLng);
-    createComment = json['createComment'];
-    print("########### DEBUG #### "
-        " Key       " + key +
-        " version   " + version.toString() +
-        " createLat " + createLat.toStringAsFixed(4) +
-        " create Comment " + createComment);
-  }
 
 }  // end of DbAdmin class ######             end of DbAdmin class ######             end of DbAdmin class ######
+
+
+// ############################################################################# dbAdminFromString
+// #    dbAdminFromString is not a method of DbAdmin
+// #
+// #    generates a NEW dbAdmin, don't want to overwrite one used to Create
+// #    converts String to Map, then decodes it
+// #############################################################################
+DbAdmin dbAdminFromString(String jsonString) {
+  // populate with defaults (in case new fields added)
+  DbAdmin _result = defaultDbAdmin;
+
+  // convert String to map
+  Map<String, dynamic> json = stringToMapConverter(jsonString);
+
+  _result.key                            =       ( json['key'] ?? defaultDbAdmin.key);
+  _result.version                        =    int.parse(( json['version'] ?? defaultDbAdmin.version).toString());
+  _result.lastAction                     =       ( json['lastAction'] ?? defaultDbAdmin.lastAction);
+  _result.createComment                  =       ( json['createComment'] ?? defaultDbAdmin.createComment);
+  _result.calledFrom                     =       ( json['calledFrom'] ?? defaultDbAdmin.calledFrom);
+  _result.createDateTimeText             =       ( json['createDateTimeText'] ?? defaultDbAdmin.createDateTimeText);
+  _result.createDateTimeInt              =    int.parse(( json['createDateTimeInt'] ?? defaultDbAdmin.createDateTimeInt).toString());
+  _result.createLat                      =    double.parse(( json['createLat'] ?? defaultDbAdmin.createLat).toString());
+  _result.createLng                      =    double.parse(( json['createLng'] ?? defaultDbAdmin.createLng).toString());
+  _result.createDeviceId                 =       ( json['createDeviceId'] ?? defaultDbAdmin.createDeviceId);
+  _result.createDeviceDescription        =       ( json['createDeviceDescription'] ?? defaultDbAdmin.createDeviceDescription);
+  _result.createUserId                   =       ( json['createUserId'] ?? defaultDbAdmin.createUserId);
+  _result.createAppName                  =       ( json['createAppName'] ?? defaultDbAdmin.createAppName);
+  _result.createAppVersion               =       ( json['createAppVersion'] ?? defaultDbAdmin.createAppVersion);
+  _result.updateComment                  =       ( json['updateComment'] ?? defaultDbAdmin.updateComment);
+  _result.updateDateTimeText             =       ( json['updateDateTimeText'] ?? defaultDbAdmin.updateDateTimeText);
+  _result.updateDateTimeInt              =    int.parse(( json['updateDateTimeInt'] ?? defaultDbAdmin.updateDateTimeInt).toString());
+  _result.updateLat                      =    double.parse(( json['updateLat'] ?? defaultDbAdmin.updateLat).toString());
+  _result.updateLng                      =    double.parse(( json['updateLng'] ?? defaultDbAdmin.updateLng).toString());
+  _result.updateDeviceId                 =       ( json['updateDeviceId'] ?? defaultDbAdmin.updateDeviceId);
+  _result.updateDeviceDescription        =       ( json['updateDeviceDescription'] ?? defaultDbAdmin.updateDeviceDescription);
+  _result.updateUserId                   =       ( json['updateUserId'] ?? defaultDbAdmin.updateUserId);
+  _result.updateAppName                  =       ( json['updateAppName'] ?? defaultDbAdmin.updateAppName);
+  _result.updateAppVersion               =       ( json['updateAppVersion'] ?? defaultDbAdmin.updateAppVersion);
+  _result.spareString                    =       ( json['spareString'] ?? defaultDbAdmin.spareString);
+
+  /// my manually derived versions   ^^ spreadsheet versions above
+  // _result.key           = json['key'];
+  // _result.lastAction    = json['lastAction'] ?? defaultDbAdmin.lastAction;
+  // //                                 .toString will fail is Null, so put the toString AFTER null check
+  // _result.version       = int.parse((json['version'] ?? defaultDbAdmin.version).toString());
+  // _result.createLat     = double.parse((json['createLat'] ?? defaultDbAdmin.createLat).toString());
+  // _result.createLng     = double.parse((json['createLng'] ?? defaultDbAdmin.createLng).toString());
+  // _result.createComment = json['createComment'];
+  // _result.updateLng =double.parse(( json['updateLng'] ?? defaultDbAdmin.updateLng).toString());
+
+  // print(" ### dbAdminFromString ### "
+  //     " Key       " + _result.key +
+  //     " version   " + _result.version.toString() +
+  //     " createLat " + _result.createLat.toStringAsFixed(4) +
+  //     " create Comment " + _result.createComment);
+  return _result;
+} // end of dbAdminFromString ######### end of dbAdminFromString #########
+
+// #############################################################################
+// string to map converter
+// #############################################################################
+Map<String, dynamic> stringToMapConverter(String inputString) {
+  Map decoded = jsonDecode(inputString);
+  decoded.forEach((key1, value1) {
+    print("Key= "+ key1 + " Value= "+ value1.toString());
+  });
+  return decoded;
+}  // end of stringToMapConverter
 
 List<DbAdmin> dbAdminList = [];                // array to store DbAdmin values
 DbAdmin  workingDbAdmin;                       // a working or current DbAdmin set
@@ -390,40 +453,45 @@ DbAdmin defaultDbAdmin = DbAdmin  (
 );
 
 
+
+
+// #############################################################################  test stuff
+// #############################################################################  test stuff
+// #############################################################################  test stuff
+// #############################################################################  test stuff
 void testDbAdmin(){
   String _tempString;
   DbAdmin dbAdmin = new DbAdmin();
 
   dbAdmin.initialise();
 
-  _tempString = "dbPrint Test message (1)";
+  _tempString = "dbPrint Test message (Row 468)";
 
-  dbAdmin.dbPrint(_tempString,"testDbAdmin line 284", null);
+  dbAdmin.dbPrint(_tempString,"testDbAdmin line 470", null);
 
-  _tempString = "dbPrint Test message (2)";
+  _tempString = "dbLog Test message (Row 472)";
 
-  dbAdmin.dbLog(_tempString,"testDbAdmin line 286", null);
-
+  dbAdmin.dbLog(_tempString,"testDbAdmin line 474", null);
+  print(" #### about to convert debug message to json @@@ JSON OUTPUT @@@ JSON OUTPUT @@@ JSON OUTPUT ");
   _tempString = dbAdmin.toString();
 
-  print("## DEBUG TEST ##> " + _tempString);
+  print(_tempString);
 
-  _tempString = dbAdmin.createAsString("Debug test createText", "whereFrom= testDbAdmin row 290", "sourceKey 290");
+  _tempString = dbAdmin.createAsString("dbAdmin CREATE Text", "whereFrom= testDbAdmin row 480", "DUMMY_SOURCEKEY");
 
-  print("## DEBUG TEST ##> " + _tempString);
+  print(" #### about to convert *createAsString* message to json @@@ JSON OUTPUT @@@ JSON OUTPUT @@@ JSON OUTPUT ");
+  print(_tempString);
 
   dbAdminList.add(dbAdmin);
 
-  anotherJSONTest(_tempString);
+  print(" #### about to de-convert *createAsString* string output back to dAdmin object ");
 
+  //stringToMapConverter(_tempString);
   //dbAdmin.fromJSON("[" + _tempString + "]");
 
-  print("dbAdminList length =" + dbAdminList.length.toString());
-}
+  DbAdmin _decoded = dbAdminFromString(_tempString);
+  print(" #### about to print selected fields from de-converted _decoded.  Key= " +
+      _decoded.key                + " | " + _decoded.createComment +
+      _decoded.createDateTimeText + " | " + _decoded.createDeviceDescription );
 
-void anotherJSONTest(String inputString) {
-  Map decoded = jsonDecode(inputString);
-  decoded.forEach((key1, value1) {
-    print("Key= "+ key1 + " Value= "+ value1.toString());
-  });
-}
+} // end of testDbAdmin
